@@ -1,4 +1,9 @@
 #lab1
+#In Python, everything that is not in a function, is in the main function
+#So I have indicated the start of the main function with a line of ####### 
+#Which is around line 44. So it's good to start reading from there.
+
+#importing libraries
 import sys
 from llist import sllist, sllistnode
 import random
@@ -6,8 +11,7 @@ import time
 
 
 
-
-
+#These are the functions
 
 #generate packet (time of generation and size)
 def genPkt(lamda, mu, time):
@@ -37,7 +41,7 @@ def server(arrivalTime, waitingTime, pktSize):
 
 
 
-
+#################################################################
 # From this below, is the main function
 
 #constants
@@ -51,6 +55,7 @@ npkts = sys.argv[1]
 lamda = sys.argv[2]
 
 pkts = sllist()
+length = len(pkts)
 
 time = 0
 pktnumber = 0
@@ -63,11 +68,14 @@ for pkt in range(npkts):
 	pktSize = getPkt[1]
 	time = getPkt[2]
 
+	print "[%d]: pkt %d arrives and finds %d packets in queue" %(arrivalTime, pktnumber, length)
+
 	waitingTime = queue(pktnumber, timeOutPrevious, arrivalTime)
 
 	pktToServer = server(arrivalTime, waitingTime, pktSize)
 	timeIn = pktToServer[0]
 	timeOut = pktToServer[1]
+
 	timeOutPrevious = timeOut
 
 	pktnumber += 1
@@ -80,19 +88,7 @@ for pkt in range(npkts):
 
 
 
-
-
-
-i = 0
-while i <= npkts
-
-
-	
-
-
-
-
-
+#ignore these
 #Event management library
 def addNewEvent():
 
@@ -101,17 +97,5 @@ def deleteEvent():
 def retrieveNextEvent():
 
 
-
-
-#Source model
-
-
-
-
-
-
-
-
-#Service model'''
 
 
