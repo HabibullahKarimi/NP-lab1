@@ -17,7 +17,7 @@ import time
 def genPkt(lamda, mu, time):
 	intervalTime = random.expovariate(1.0/lamda) 
 	arrivalTime = intervalTime + time
-	time = arrivalTime + time 	#update time
+	time = arrivalTime 	#update time
 	pktSize = int(random.expovariate(1.0/mu)) # in bits
 
 	return [arrivalTime, pktSize, time]
@@ -68,8 +68,14 @@ time = 0
 pktNumber = 0
 timeOutPrevious = 0
 
+TotalCustomerInQueue = 0
+TotalTimeInQueue = 0
+nPacketsInSystem = [0,0,0,0,0,0,0,0,0,0,0]
+
+
 #main loop
 for pkt in range(npkts):
+	TotalCustomerInQueue += len(lst)
 	pktNumber += 1
 	getPkt = genPkt(lamda, mu, time)
 	arrivalTime = getPkt[0]
@@ -88,7 +94,7 @@ for pkt in range(npkts):
 	
 	if len(lst) == 0:
 			lst.append(pkt)
-			print "***[%s]: pkt %s arrives and finds %s packets in queue" %(arrivalTime, pktNumber, len(lst))
+			print "[%.3f]: pkt %s arrives and finds %d packets in queue" %(arrivalTime, pktNumber, len(lst))
 			continue
 
 	addNode(pkt)
@@ -98,7 +104,8 @@ for pkt in range(npkts):
 			flag = 1
 			for j in range(len(lst) - 1, i - 1, -1):
 				timeSpent = lst[j][2] - lst[j][1]
-				print "---[%s]: pkt %s departs having spent %s us in the system" %(lst[j][2], lst[j][0], timeSpent)
+				TotalTimeInQueue += timeSpent
+				print "[%.3f]: pkt %s departs having spent %.3f us in the system" %(lst[j][2], lst[j][0], timeSpent)
 					
 			for j in range(len(lst) - 1, i - 1, -1):
 				node = lst.nodeat(j)
@@ -106,14 +113,27 @@ for pkt in range(npkts):
 				
 		if flag == 1:
 			break
+	if len(lst) <= 10:
+		print len(lst)
+		nPacketsInSystem[len(lst)] += 1		
+	print "[%.3f]: ppkt %s arrives and finds %d packets in queue" %(arrivalTime, pktNumber, len(lst))
 
-	print "---[%s]: ppkt %s arrives and finds %s packets in queue" %(arrivalTime, pktNumber, len(lst))
-
-	
-
-
+for j in range(len(lst) - 1, - 1, -1):
+				timeSpent = lst[j][2] - lst[j][1]
+				TotalTimeInQueue += timeSpent
+				print "[%.3f]: pkt %s departs having spent %.3f us in the system" %(lst[j][2], lst[j][0], timeSpent)
 		
 
+N = TotalCustomerInQueue / npkts
+T = float(TotalTimeInQueue) / npkts
+print "N = %d, S = %.3f" %(N,T)
 
+
+probability = [0,0,0,0,0,0,0,0,0,0,0]
+for i in range(11):
+	probability[i] = float(nPacketsInSystem[i]) / npkts
+
+print probability
+	
 
 
