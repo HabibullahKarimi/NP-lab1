@@ -9,6 +9,10 @@ from llist import sllist, sllistnode
 import random
 import time
 
+#for plotting the graph
+import plotly
+import plotly.graph_objs
+
 
 
 #These are the functions
@@ -39,6 +43,7 @@ def server(arrivalTime, waitingTime, pktSize):
 	
 	return [timeIn, timeOut]
 
+#Adding new node to the linked list, sorted in order of decreasing departure time
 def addNode(newNode):
 	for i in range(len(lst)):  #Arranges lst 
 		if newNode[2] > lst[i][2]:
@@ -91,7 +96,6 @@ for pkt in range(npkts):
 
 	pkt = [pktNumber,arrivalTime,departTime]
 
-	
 	if len(lst) == 0:
 			lst.append(pkt)
 			print "[%.3f]: pkt %s arrives and finds %d packets in queue" %(arrivalTime, pktNumber, len(lst))
@@ -113,9 +117,10 @@ for pkt in range(npkts):
 				
 		if flag == 1:
 			break
+
 	if len(lst) <= 10:
-		print len(lst)
 		nPacketsInSystem[len(lst)] += 1		
+
 	print "[%.3f]: ppkt %s arrives and finds %d packets in queue" %(arrivalTime, pktNumber, len(lst))
 
 for j in range(len(lst) - 1, - 1, -1):
@@ -132,8 +137,12 @@ print "N = %d, S = %.3f" %(N,T)
 probability = [0,0,0,0,0,0,0,0,0,0,0]
 for i in range(11):
 	probability[i] = float(nPacketsInSystem[i]) / npkts
-
+print nPacketsInSystem
 print probability
 	
-
+plotly.offline.plot({
+"data": [
+    plotly.graph_objs.Bar(x=[0,1,2,3,4,5,6,7,8,9,10],y=probability)
+]
+})
 
