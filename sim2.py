@@ -19,30 +19,24 @@ def genPkt(lamda, mu, time):
 	arrivalTime = intervalTime + time
 	time = arrivalTime + time 	#update time
 	pktSize = int(random.expovariate(1.0/mu)) # in bits
-	#print "Arrival time in us is: %s and pktsize is: %s" %(arrivalTime, pktSize)
-	print "intervalTime is %s" %(intervalTime)
+
 	return [arrivalTime, pktSize, time]
 
 def queue(pktNumber, timeOutPrevious, arrivalTime):
 	waitingTime = timeOutPrevious - arrivalTime
-	#print "arrival time of new pkt is %s dep time of prev pkt is %s" %(arrivalTime, timeOutPrevious)
-	#print "waitingTime1 is %s" %(waitingTime)
 	if pktNumber == 1:
 		waitingTime = 0
 	if waitingTime < 0:
 		waitingTime = 0
 
-	#print "waitingTime is %s" %(waitingTime)
 	return waitingTime
 
 #Pass pkt to the server for service
 def server(arrivalTime, waitingTime, pktSize):
 	serviceTime = float(pktSize) / serviceRate
-	print "Service time is %s" %(serviceTime) 
 	timeIn = arrivalTime + waitingTime
 	timeOut = timeIn + serviceTime
 	
-	#print "Departure time is %s" %(timeOut)
 	return [timeIn, timeOut]
 
 def addNode(newNode):
@@ -77,17 +71,12 @@ timeOutPrevious = 0
 #main loop
 for pkt in range(npkts):
 	pktNumber += 1
-	print "\n"
 	getPkt = genPkt(lamda, mu, time)
 	arrivalTime = getPkt[0]
-	print "arrivaltime1 %s" %(arrivalTime)
 	pktSize = getPkt[1]
 	time = getPkt[2]
-	#print lst
-	#print "prev out is: %s arrival time is %s" %(timeOutPrevious, arrivalTime)
+
 	waitingTime = queue(pktNumber, timeOutPrevious, arrivalTime)
-	print "waiting time is %s" %(waitingTime)
-	#print "waiting time is %s" %(waitingTime)
 
 	pktToServer = server(arrivalTime, waitingTime, pktSize)
 	timeIn = pktToServer[0]
@@ -103,7 +92,6 @@ for pkt in range(npkts):
 			continue
 
 	addNode(pkt)
-	print lst
 	flag = 0
 	for i in range(len(lst)):
 		if arrivalTime > lst[i][2]:
