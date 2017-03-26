@@ -26,6 +26,7 @@ def genPkt(lamda, mu, time):
 
 	return [arrivalTime, pktSize, time]
 
+#Finding the time spent in queue
 def queue(pktNumber, timeOutPrevious, arrivalTime):
 	waitingTime = timeOutPrevious - arrivalTime
 	if pktNumber == 1:
@@ -57,17 +58,11 @@ def addNode(newNode):
 # From this below, is the main function
 
 #constants
-npkts = 10
 lamda = 1
 mu = 10000  #mean size of packets
-serviceRate = 10000 #serverice rate is 10Gbps = 10,000 bits/micro second 
-eventTypeOne = 0
-eventTypeTwo = 1
+
 
 #variables
-npkts = int(sys.argv[1])
-lamda = int(sys.argv[2])
-
 lst = sllist()
 time = 0
 pktNumber = 0
@@ -77,15 +72,48 @@ TotalCustomerInQueue = 0
 TotalTimeInQueue = 0
 nPacketsInSystem = [0,0,0,0,0,0,0,0,0,0,0]
 
+if len(sys.argv) == 2:	
+	if sys.argv[1] == "trace.txt":
+		serviceRate = 4000
+		loopList = open("trace.txt", "r")
+	elif sys.argv[1] == "trace2.txt":
+		serviceRate = 7000
+		loopList = open("trace2.txt", "r")
+	else: 
+		six.exit("currently program accepts argv[1] to be trace.txt or trace2.txt\n")
+elif len(sys.argv) == 3:
+	numberOfpkts = int(sys.argv[1])
+	lamda = int(sys.argv[2])
+	serviceRate = 10000 #serverice rate is 10Gbps = 10,000 bits/micro second 
+	loopList = range(numberOfpkts)
+else:
+	sys.exit("Wrong number of arguments\n")
+
+
+
+npkts = 0
 
 #main loop
-for pkt in range(npkts):
+for pkt in loopList:
 	TotalCustomerInQueue += len(lst)
 	pktNumber += 1
-	getPkt = genPkt(lamda, mu, time)
-	arrivalTime = getPkt[0]
-	pktSize = getPkt[1]
-	time = getPkt[2]
+	npkts += 1
+
+	#If want to go through 1000 pkts or only, uncomment below 2 lines
+	if npkts == 1000:
+		break
+
+	if len(sys.argv) == 3:
+		getPkt = genPkt(lamda, mu, time)
+		arrivalTime = getPkt[0]
+		pktSize = getPkt[1]
+		time = getPkt[2]
+	elif len(sys.argv) == 2:
+		line = pkt.split( )
+		arrivalTime = float(line[0])
+		pktSize = line[1]
+	else:
+		sys.exit("Program shouldn't reach this line\n")
 
 	waitingTime = queue(pktNumber, timeOutPrevious, arrivalTime)
 
