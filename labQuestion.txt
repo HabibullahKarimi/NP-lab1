@@ -1,0 +1,41 @@
+TELE 4642: Network Performance: Lab 1 [10 points, Due Week 5]
+
+Note: This lab should be done in pairs, i.e. in groups of two students.
+The objective of this exercise is to develop software that lets you observe and measure the performance of a modified M/M/1 queueing system via simulation. Wikipedia provides good introductory information on network simulation; you will specifically develop software for a discrete event simulation of an M/M/1 system with burst arrivals.
+
+Your discrete-event simulation should be implemented as a single thread (i.e. single process) that consists of the following functional blocks:
+
+A event management library that provides library functions to store events in order of their occurrence time. You need functions to efficiently add a new event, delete an existing event, and retrieve the next event. You may use a simple linked list to begin with. Think carefully about the types of events that can happen in your system (source state change, packet arrival/departure, ...)
+An source model that manages packet arrivals and schedules appropriate events. You will explore two different source models in this lab.
+A service model that serves packets in the queue. When a packet enters service, an event is created corresponding to the departure time of the packet (determined by service rate and length of packet). At each departure event, the next packet (if any) in queue should enter service. Note that you should compute the departure time of a packet only when the packet enters service, not upon packet arrival to a non-empty queue (think why). The service model is invoked upon each packet departure.
+(Part a)[8 points]: Poisson Process Source Model
+
+In this part, you need to write a program for an source model that generates packet arrivals as a Poisson Process (with given parameter lambda) and schedules appropriate events. Note that at any point of time you need to have an event scheduled for the source: the next packet arrival. The source model gets invoked upon each packet arrival (to schedule the next packet).
+
+Your simulations will make the following assumptions:
+Packet sizes are exponentially distributed with a mean size of 10,000 bits or 1250 Bytes. Even though the exponential is a continuous distribution, you will approximate it by discretizing the packet size by rounding to the closest integral byte value.
+The server (communication link) has a fixed capacity 10Gbps, which, for mean packet size of 10,000 bits, is equivalent to serving 1 million packets per second (or one packet per microsecond) on average.
+The source generates packets as a Poisson process at a specified rate lambda.
+Queueing space in infinite, i.e. packets are never dropped.
+The following notation is used: us for microseconds, ms for milliseconds, and sec for seconds.
+Your program should perform the packet-level simulation of arrivals and departures, and alongside maintain statistics that will be displayed at the end of the simulation (as described below). Your demonstration should include the following:
+Your main program should be invoked with command-line arguments as follows: sim npkts lambda where sim refers to the name of the executable, npkts refers to the number of packets to be simulated, lambda is the packet arrival rate (in packets per us). Upon termination of the simulation your program should print out statistics (as described below).
+As each event occurs, your simulation should print out a message indicating the time (in us) at which the event occurs, the nature of the event, and any additional statistics information. For example, packet arrivals could print the message: "[3749.00]: pkt 2748 arrives and finds 38 packets in the queue". Packet departures could print the message "[4638.00]: pkt 6102 departs having spent 243.00 us in the system". Please note that the messages printed by your simulation have (by definition) to be in chronological order, otherwise it defeats the purpose of a simulation.
+When the simulation ends (i.e. all packets have been served), your program should print the following:
+N, the average number of customers in the system,
+T, the average time spent by customer in the system,
+For each n between 0 and 10, the probability P(n) that an arriving packet finds n packets already in the system.
+You will run your program (each run should simulate at least a million packets) for the following three combinations of parameters (verify that each combination yields a stable system):
+[smooth]: lambda = 1 pkts/us
+[bursty]: lambda = 9 pkts/us
+[balanced]: lambda = 1.8 pkts/us
+For each run, your submission will show N and T. Additionally for each run you will also show a plot of P(n) versus n.
+(Part b)[2 points]: Long Range Dependence (LRD) Source Model
+
+In this part, you need to write a program for an source model that reads packet arrivals from a trace file of real Internet traffic and schedules appropriate events. The trace file represents a traffic with average rate of 4Gbps and contains two columns: the first column represents the inter-arrival time in microseconds(us) and the second column represents the packet size in Bytesc. Your simulator next uses another traffic trace (trace2) with average rate of 7Gbps.
+
+Your program should perform the packet-level simulation of arrivals and departures, and alongside maintain statistics that will be displayed at the end of the simulation. Your demonstration should include the following:
+
+Your main program should be invoked with command-line arguments as follows: sim trace where sim refers to the name of the executable, trace refers to the name of the traffic trace file. Upon termination of the simulation your program should print out statistics (as described above in part a).
+
+[Note]: This exercise is to be done in your own time on your own computing equipment, and demonstrated in lab by week 5. Lab times should be used to clarify any questions and to get any assistance from the lab demonstrator, and for demonstrating your final working code.
