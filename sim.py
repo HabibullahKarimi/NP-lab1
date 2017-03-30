@@ -14,7 +14,6 @@ import plotly
 import plotly.graph_objs
 
 
-
 #These are the functions
 
 #generate packet (time of generation and size)
@@ -80,7 +79,7 @@ if len(sys.argv) == 2:
 		serviceRate = 7000
 		loopList = open("trace2.txt", "r")
 	else: 
-		six.exit("currently program accepts argv[1] to be trace.txt or trace2.txt\n")
+		sys.exit("currently program accepts argv[1] to be trace.txt or trace2.txt\n")
 elif len(sys.argv) == 3:
 	numberOfpkts = int(sys.argv[1])
 	lamda = int(sys.argv[2])
@@ -92,6 +91,7 @@ else:
 
 
 npkts = 0
+arrivalTime = 0
 
 #main loop
 for pkt in loopList:
@@ -100,7 +100,7 @@ for pkt in loopList:
 	npkts += 1
 
 	#If want to go through 1000 pkts or only, uncomment below 2 lines
-	if npkts == 1000:
+	if npkts == 10000:
 		break
 
 	if len(sys.argv) == 3:
@@ -108,10 +108,13 @@ for pkt in loopList:
 		arrivalTime = getPkt[0]
 		pktSize = getPkt[1]
 		time = getPkt[2]
+		#print "arrival time is %s and time is %s\n" %(arrivalTime, time)
 	elif len(sys.argv) == 2:
 		line = pkt.split( )
-		arrivalTime = float(line[0])
-		pktSize = line[1]
+		intervalTime = float(line[0])
+		pktSize = int(line[1])
+		#print "pkts size is %d arrivalTime is %s\n" %(pktSize, arrivalTime)
+		arrivalTime += intervalTime
 	else:
 		sys.exit("Program shouldn't reach this line\n")
 
@@ -126,31 +129,36 @@ for pkt in loopList:
 
 	if len(lst) == 0:
 			lst.append(pkt)
-			print "[%.3f]: pkt %s arrives and finds %d packets in queue" %(arrivalTime, pktNumber, len(lst))
+			print "[%.3f]: pkt %s arrives and finds %d packets in queue" %(arrivalTime, pktNumber, len(lst) - 1)
 			continue
 
-	addNode(pkt)
+	addNode(pkt) #If not the first packet, add pkt to the sorted list
 	flag = 0
 	for i in range(len(lst)):
 		if arrivalTime > lst[i][2]:
-			flag = 1
+			flag = 1 #the arrival event happens after some departure events
+
+			#Print out those departure events from the list which happen before the arrival event
 			for j in range(len(lst) - 1, i - 1, -1):
 				timeSpent = lst[j][2] - lst[j][1]
 				TotalTimeInQueue += timeSpent
 				print "[%.3f]: pkt %s departs having spent %.3f us in the system" %(lst[j][2], lst[j][0], timeSpent)
-					
+			
+			#Remove the those departure events from he list		
 			for j in range(len(lst) - 1, i - 1, -1):
 				node = lst.nodeat(j)
 				lst.remove(node)
 				
-		if flag == 1:
+		if flag == 1: #If arrival happens before any of the departure events in the list, then don't execute this loop
 			break
 
 	if len(lst) <= 10:
 		nPacketsInSystem[len(lst)] += 1		
 
-	print "[%.3f]: ppkt %s arrives and finds %d packets in queue" %(arrivalTime, pktNumber, len(lst))
+	#After departure events which happen before the arrival event, print the arrival event
+	print "[%.3f]: ppkt %s arrives and finds %d packets in queue" %(arrivalTime, pktNumber, len(lst) -1)
 
+#Print out the remaining departure events in the queue
 for j in range(len(lst) - 1, - 1, -1):
 				timeSpent = lst[j][2] - lst[j][1]
 				TotalTimeInQueue += timeSpent
@@ -159,7 +167,7 @@ for j in range(len(lst) - 1, - 1, -1):
 
 N = TotalCustomerInQueue / npkts
 T = float(TotalTimeInQueue) / npkts
-print "N = %d, S = %.3f" %(N,T)
+print "N = %d, T = %.3f" %(N,T)
 
 
 probability = [0,0,0,0,0,0,0,0,0,0,0]
@@ -173,4 +181,3 @@ plotly.offline.plot({
     plotly.graph_objs.Bar(x=[0,1,2,3,4,5,6,7,8,9,10],y=probability)
 ]
 })
-
